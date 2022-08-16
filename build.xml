@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<project name="fax" basedir="." default="build">
+   <property name="src.dir" value="src"/>
+   <property name="web.dir" value="BOOT-INF"/>
+   <property name="build.dir" value="${web.dir}/classes"/>
+   <property name="name" value="fax"/>
+   <property name="tomcat.home" value="/Users/sys71m/Downloads/apache-tomcat-10.0.23"/>
+
+   <path id="master-classpath">
+      <fileset dir="${web.dir}/lib">
+         <include name="*.jar"/>
+      </fileset>
+      <pathelement path="${build.dir}"/>
+   </path>
+
+   <target name="build" description="Compile source tree java files">
+      <mkdir dir="${build.dir}"/>
+      <javac destdir="${build.dir}"
+         source="1.8" target="1.8"
+         optimize="off"
+         debug="on" failonerror="false"
+         >
+         <src path="${src.dir}"/>
+         <classpath refid="master-classpath"/>
+      </javac>
+   </target>
+
+</project>
