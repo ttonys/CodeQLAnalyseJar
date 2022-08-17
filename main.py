@@ -40,7 +40,7 @@ if __name__ == '__main__':
 
     unzip(zip_path)
 
-    if build_xml is not True:
+    if build_xml is True:
         build_ant_xml(xml_path, out_path, tomcat_path)
     # ant_build()
 

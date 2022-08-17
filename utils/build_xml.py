@@ -61,17 +61,18 @@ def check_tomcat_dir(tomcat_path):
 
 
 def build_ant_xml(xml_path, out_path, tomcat_path):
+    # todo: del node bug
     tree = read_xml(xml_path)
 
     property_nodes = find_nodes(tree, "property")
     web_dir_property_node = get_node_by_key_value(property_nodes, {"name": "web.dir"})
     tomcat_dir_property_node = get_node_by_key_value(property_nodes, {"name": "tomcat.dir"})
 
-    pathelement_nodes = find_nodes(tree, "pathelement")
+    pathelement_nodes = find_nodes(tree, "path/pathelement")
     web_dir_pathelement_node = get_node_by_key_value(pathelement_nodes, {"path": "${web.dir}/classes"})
     tomcat_dir_pathelement_node = get_node_by_key_value(pathelement_nodes, {"path": "${tomcat.home}/lib"})
 
-    fileset_nodes = find_nodes(tree, "fileset")
+    fileset_nodes = find_nodes(tree, "path/fileset")
     web_dir_fileset_node = get_node_by_key_value(fileset_nodes, {"dir": "${web.dir}/lib"})
     tomcat_dir_fileset_lib_node = get_node_by_key_value(fileset_nodes, {"dir": "${tomcat.home}/lib"})
     tomcat_dir_fileset_bin_node = get_node_by_key_value(fileset_nodes, {"dir": "${tomcat.home}/bin"})
@@ -88,6 +89,6 @@ def build_ant_xml(xml_path, out_path, tomcat_path):
         del_node(fileset_nodes, tomcat_dir_fileset_bin_node)
         del_node(fileset_nodes, tomcat_dir_fileset_lib_node)
     else:
-        change_node_properties(tomcat_dir_property_node, {"value", tomcat_path})
+        change_node_properties(tomcat_dir_property_node, {"value": tomcat_path})
 
     write_xml(tree, os.path.join(out_path, "build.xml"))
