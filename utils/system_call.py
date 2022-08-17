@@ -48,8 +48,3 @@ def unzip(zip_path):
         zip_file.extract(f, os.path.join(os.path.dirname(zip_path), "src2"))
     zip_file.close()
 
-
-def ant_build():
-    exit()
-
-
