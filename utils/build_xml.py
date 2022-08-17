@@ -3,7 +3,7 @@
 # @FileName: build_xml.py
 # @Software: PyCharm
 import os.path
-from xml.etree.ElementTree import ElementTree
+from xml.etree.ElementTree import ElementTree, Element
 
 
 def change_node_properties(nodelist, kv_map, is_delete=False):
@@ -52,6 +52,17 @@ def write_xml(tree, out_path):
     tree.write(out_path, encoding="utf-8", xml_declaration=True)
 
 
+def add_child_node(nodelist, element):
+    for node in nodelist:
+        node.append(element)
+
+
+def create_node(tag, property_map, content):
+    element = Element(tag, property_map)
+    element.text = content
+    return element
+
+
 def check_web_dir(out_path):
     return os.path.exists(os.path.join(out_path, "src2", "BOOT-INF"))
 
@@ -61,34 +72,31 @@ def check_tomcat_dir(tomcat_path):
 
 
 def build_ant_xml(xml_path, out_path, tomcat_path):
-    # todo: del node bug
     tree = read_xml(xml_path)
 
     property_nodes = find_nodes(tree, "property")
     web_dir_property_node = get_node_by_key_value(property_nodes, {"name": "web.dir"})
     tomcat_dir_property_node = get_node_by_key_value(property_nodes, {"name": "tomcat.dir"})
 
-    pathelement_nodes = find_nodes(tree, "path/pathelement")
-    web_dir_pathelement_node = get_node_by_key_value(pathelement_nodes, {"path": "${web.dir}/classes"})
-    tomcat_dir_pathelement_node = get_node_by_key_value(pathelement_nodes, {"path": "${tomcat.home}/lib"})
-
-    fileset_nodes = find_nodes(tree, "path/fileset")
-    web_dir_fileset_node = get_node_by_key_value(fileset_nodes, {"dir": "${web.dir}/lib"})
-    tomcat_dir_fileset_lib_node = get_node_by_key_value(fileset_nodes, {"dir": "${tomcat.home}/lib"})
-    tomcat_dir_fileset_bin_node = get_node_by_key_value(fileset_nodes, {"dir": "${tomcat.home}/bin"})
     if check_web_dir(out_path):
         change_node_properties(web_dir_property_node, {"value": "src2/BOOT-INF"})
-    else:
-        del_node(property_nodes, web_dir_property_node)
-        del_node(pathelement_nodes, web_dir_pathelement_node)
-        del_node(fileset_nodes, web_dir_fileset_node)
+        node1 = create_node("pathelement", {"path": "${web.dir}/classes"}, "")
+        node2 = create_node("fileset", {"dir": "${web.dir}/lib"}, "")
+        add_child_node(tree.getroot().findall(".//path"), node1)
+        add_child_node(tree.getroot().findall(".//path"), node2)
 
-    if tomcat_path is False or check_tomcat_dir(tomcat_path) is False:
-        del_node(property_nodes, tomcat_dir_property_node)
-        del_node(pathelement_nodes, tomcat_dir_pathelement_node)
-        del_node(fileset_nodes, tomcat_dir_fileset_bin_node)
-        del_node(fileset_nodes, tomcat_dir_fileset_lib_node)
-    else:
+    if tomcat_path:
         change_node_properties(tomcat_dir_property_node, {"value": tomcat_path})
+        node1 = create_node("pathelement", {"path": "${tomcat.home}/lib"}, "")
+        node2 = create_node("fileset", {"dir": "${tomcat.home}/lib"}, "")
+        node3 = create_node("fileset", {"dir": "${tomcat.home}/bin"}, "")
+
+        add_child_node(tree.getroot().findall(".//path"), node1)
+        add_child_node(tree.getroot().findall(".//path"), node2)
+        add_child_node(tree.getroot().findall(".//path"), node3)
+
+    if check_web_dir(out_path) or tomcat_path:
+        node = create_node("include", {"name": "*.jar"}, "")
+        add_child_node(tree.getroot().findall(".//path/fileset"), node)
 
     write_xml(tree, os.path.join(out_path, "build.xml"))

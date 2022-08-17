@@ -6,6 +6,18 @@
     <property name="tomcat.dir" value="default"/>
 
     <path id="master-classpath">
+        <pathelement path="${web.dir}/classes"/>
+        <fileset dir="${web.dir}/lib">
+            <include name="*.jar"/>
+        </fileset>
+
+        <pathelement path="${tomcat.home}/lib"/>
+        <fileset dir="${tomcat.home}/lib">
+            <include name="*.jar"/>
+        </fileset>
+        <fileset dir="${tomcat.home}/bin">
+            <include name="*.jar"/>
+        </fileset>
     </path>
 
     <target name="build" description="Compile source tree java files">
