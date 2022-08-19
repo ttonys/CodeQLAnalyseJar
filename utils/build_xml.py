@@ -87,9 +87,9 @@ def build_ant_xml(xml_path, out_path, tomcat_path):
 
     if tomcat_path:
         change_node_properties(tomcat_dir_property_node, {"value": tomcat_path})
-        node1 = create_node("pathelement", {"path": "${tomcat.home}/lib"}, "")
-        node2 = create_node("fileset", {"dir": "${tomcat.home}/lib"}, "")
-        node3 = create_node("fileset", {"dir": "${tomcat.home}/bin"}, "")
+        node1 = create_node("pathelement", {"path": "${tomcat.dir}/lib"}, "")
+        node2 = create_node("fileset", {"dir": "${tomcat.dir}/lib"}, "")
+        node3 = create_node("fileset", {"dir": "${tomcat.dir}/bin"}, "")
 
         add_child_node(tree.getroot().findall(".//path"), node1)
         add_child_node(tree.getroot().findall(".//path"), node2)
